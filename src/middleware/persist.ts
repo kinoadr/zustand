@@ -83,6 +83,10 @@ export type PersistOptions<
    * By default, this function does a shallow merge.
    */
   merge?: (persistedState: any, currentState: S) => S
+  /**
+   * Wait for the given promise to resolve before proceeding to hydration.
+   */
+  hydrateOnResolve?: Promise<void>
 }
 
 type PersistListener<S> = (state: S) => void
@@ -186,6 +190,7 @@ export const persist =
         ...currentState,
         ...persistedState,
       }),
+      hydrateOnResolve: Promise.resolve(),
       ...baseOptions,
     }
 
@@ -359,7 +364,7 @@ export const persist =
       },
     }
 
-    hydrate()
+    options.hydrateOnResolve.then(hydrate)
 
     return stateFromStorage || configResult
   }
